@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.PlaneInfoDaoMapper">
+<sql id="commSql">
+	select planeId,planeNumber,planeSince,buyTime,
+	serviceTime,tSeats,bSeats,fSeats,remark from tb_plane_info
+</sql>
+<select id="findPlaneWithPage" resultType="com.sxt.entity.PlaneInfo">
+	<include refid="commSql"/>
+	<where>
+			<if test="planeNumber !=null and planeNumber !=''">
+				planeNumber like '%${planeNumber}%'
+			</if>
+			<if test="planeSince !=null and planeSince !=''">
+				and planeSince like '%${planeSince}%'
+			</if>
+		</where>
+		limit #{page},#{rows}
+</select>
+<select id="getPlaneCount" resultType="int">
+	select count(planeId) from tb_plane_info
+</select>
+<select id="findPlaneAllInfo" resultType="com.sxt.entity.PlaneInfo">
+	<include refid="commSql"/>
+</select>
+<insert id="savePlane">
+	insert into tb_plane_info(planeNumber,planeSince,buyTime,
+	serviceTime,tSeats,bSeats,fSeats,remark)
+	values(#{planeNumber},#{planeSince},#{buyTime},
+	#{serviceTime},#{tSeats},#{bSeats},#{fSeats},#{remark})
+</insert>
+<delete id="delPlaneInfo">
+	delete from tb_plane_info where planeId=#{planeId}
+</delete>
+<select id="findPlaneById" resultType="com.sxt.entity.PlaneInfo">
+	<include refid="commSql"/>
+	where planeId=#{id}
+</select>
+<update id="updatePlaneInfo">
+	update tb_plane_info set
+	planeNumber=#{planeNumber},
+	planeSince=#{planeSince},
+	buyTime=#{buyTime},
+	serviceTime=#{serviceTime},
+	tSeats=#{tSeats},
+	bSeats=#{bSeats},
+	fSeats=#{fSeats},
+	remark=#{remark}
+	where planeId=#{planeId}
+</update>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.PermissionInfoDaoMapper">
+<sql id="commSql">
+	select permiId,permiNumber,permiName,permiDesc,remark from tb_permission
+</sql>
+<select id="findPermissionAllInfo" resultType="com.sxt.entity.PermissionInfo">
+	<include refid="commSql"/>
+</select>
+<select id="findPermissionWithPage" resultType="com.sxt.entity.PermissionInfo">
+	<include refid="commSql"/>
+	limit #{page},#{rows}
+</select>
+<select id="getPermissionCount" resultType="int">
+	select count(permiId) from tb_permission
+</select>
+<select id="findPermiName" resultType="com.sxt.entity.PermissionInfo">
+	<include refid="commSql"/>
+	where permiName=#{permiName}
+</select>
+<insert id="savePermission">
+	insert into tb_permission(permiNumber,permiName,permiDesc,remark) 
+	values(#{permiNumber},#{permiName},#{permiDesc},#{remark})
+</insert>
+<select id="findPermissionById" resultType="com.sxt.entity.PermissionInfo">
+	<include refid="commSql"/>
+	where permiId=#{permiId}
+</select>
+<update id="updatePermissionInfo">
+	update tb_permission set
+	permiNumber=#{permiNumber},
+	permiName=#{permiName},
+	permiDesc=#{permiDesc},
+	remark=#{remark}
+	where permiId=#{permiId}
+</update>
+<delete id="delPermissionInfo">
+	delete from tb_permission where permiId=#{id}
+</delete>
+</mapper>

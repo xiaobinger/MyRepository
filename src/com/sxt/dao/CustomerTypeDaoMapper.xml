@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.CustomerTypeDaoMapper">
+<sql id="commSql">
+	select ct.cusTypeId,ct.cusTypeNumber,ct.cusTypeName,ct.remark,ct.discountId,d.discountId,d.discountName
+	from tb_customer_type ct left join tb_discount d on ct.discountId=d.discountId
+</sql>
+<select id="findCustomTypeWithPage" resultType="com.sxt.entity.CustomerType">
+	<include refid="commSql"/>
+	<where>
+		<if test="cusTypeName !=null and cusTypeName !=''">
+				ct.cusTypeName like '%${cusTypeName}%'
+		</if>
+	</where>
+	limit #{page},#{rows}
+</select>
+<select id="getCusTypeCount" resultType="int">
+	select count(cusTypeId) from tb_customer_type
+</select>
+<select id="findDiscountAllInfo" resultType="com.sxt.entity.Discount">
+	select discountId,discountName from tb_discount
+</select>
+<insert id="saveCustomType">
+	insert into tb_customer_type(cusTypeNumber,cusTypeName,discountId,remark)
+	values(#{cusTypeNumber},#{cusTypeName},#{discountId},#{remark})
+</insert>
+<select id="findCusTypeById" resultType="com.sxt.entity.CustomerType">
+	<include refid="commSql"/>
+	where ct.cusTypeId=#{id}
+</select>
+<update id="updateCusTypeInfo">
+	update tb_customer_type set
+	cusTypeNumber=#{cusTypeNumber},
+	cusTypeName=#{cusTypeName},
+	discountId=#{discountId},
+	remark=#{remark}
+	where cusTypeId=#{cusTypeId}
+</update>
+<select id="findCusTypeAllInfo" resultType="com.sxt.entity.CustomerType">
+	select ct.cusTypeId,ct.cusTypeNumber,ct.cusTypeName,ct.discountId,d.discountId,d.discountName
+	from tb_customer_type ct left join tb_discount d on ct.discountId=d.discountId
+</select>
+</mapper>

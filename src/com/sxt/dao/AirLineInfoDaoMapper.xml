@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.AirLineInfoDaoMapper">
+<sql id="commSql">
+	select a.airLineId,a.airLineNumber,a.airLineTime,
+	p.planeId,p.planeSince,a.deparCity,a.arrivalCity,
+	a.outTime,a.inTime,a.sendState,a.remark,s.spaceId,
+	s.rankId,s.spacePrice,r.rankId,r.rankName from tb_airLine_info a
+	left join tb_plane_info p on a.planeId=p.planeId
+	left join tb_space_rank s on a.airLineId=s.airLineId 
+	left join tb_rank r on s.rankId=r.rankId
+</sql>
+<select id="findAirLineInfoById" resultType="com.sxt.entity.AirLineInfo">
+	<include refid="commSql"/>
+	<where>
+			<if test="airLineId !=null and airLineId !=''">
+				s.airLineId=#{airLineId}
+			</if>
+			<if test="rankId !=null and rankId !=''">
+				and s.rankId=#{rankId}
+			</if>
+	</where>
+</select>
+<select id="findAirLineAllInfo" resultType="com.sxt.entity.AirLineInfo">
+	<include refid="commSql"/>
+</select>
+<select id="findAirLineWithPage" resultType="com.sxt.entity.AirLineInfo">
+	<include refid="commSql"/>
+	<where>
+			<if test="airLineNumber !=null and airLineNumber !=''">
+				a.airLineNumber=#{airLineNumber}
+			</if>
+			<if test="planeId !=null and planeId !=''">
+				and p.planeId=#{planeId}
+			</if>
+		</where>
+		limit #{page},#{rows}
+</select>
+<select id="getAirLineCount" resultType="int">
+	select count(airLIneId) from tb_airLine_info
+</select>
+<select id="findAirLineWithRequest" resultType="com.sxt.entity.AirLineInfo">
+	<include refid="commSql"/>
+	where a.deparCity=#{deparCity} and a.arrivalCity=#{arrivalCity}
+	and a.airLineTime=#{airLineTime}
+</select>
+<insert id="saveAirLine">
+	insert into tb_airLine_info(airLineNumber,planeId,deparCity,
+	arrivalCity,airLineTime,outTime,inTime,sendState,remark)
+	values(#{airLineNumber},#{planeId},#{deparCity},#{arrivalCity},
+	#{airLineTime},#{outTime},#{inTime},#{sendState},#{remark})
+</insert>
+<update id="updateAirLineInfo">
+	update tb_airLine_info set
+	airLineNumber=#{airLineNumber},
+	planeId=#{planeId},
+	deparCity=#{deparCity},
+	arrivalCity=#{arrivalCity},
+	airLineTime=#{airLineTime},
+	outTime=#{outTime},
+	inTime=#{inTime},
+	sendState=#{sendState},
+	remark=#{remark}
+	where airLineId=#{airLineId}
+</update>
+<delete id="delAirLineInfo">
+	delete from tb_airLine_info where airLineId=#{airLineId}
+</delete>
+</mapper>

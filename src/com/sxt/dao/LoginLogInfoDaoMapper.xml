@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.LoginLogInfoDaoMapper">
+<insert id="saveLogInfo">
+	insert into tb_login_log(loginName,loginIp,loginTime,logoutTime)
+	values(#{loginName},#{loginIp},#{loginTime},#{logoutTime})
+</insert>
+<select id="findLoginLogWithPage" resultType="com.sxt.entity.LoginLogInfo">
+	select loginId,loginName,loginIp,loginTime,logoutTime from tb_login_log
+	<where>
+			<if test="loginName !=null and loginName !=''">
+				and loginName like '%${loginName}%'
+			</if>
+			<if test="loginTime !=null and loginTime!=''">
+				and loginTime like '%${loginTime}%'
+			</if>
+		</where>
+		limit #{page},#{rows}
+</select>
+<select id="getLoginLogCount" resultType="int">
+	select count(loginId) from tb_login_log
+</select>
+<select id="findAllLoginInfo" resultType="com.sxt.entity.LoginLogInfo">
+	select loginId,loginName,loginIp,loginTime,logoutTime from tb_login_log
+</select>
+<update id="updateLoginLogInfo">
+	update tb_login_log set logoutTime=#{logoutTime} where loginName=#{loginName} and loginTime=#{loginTime}
+</update>
+<delete id="delLoginLogInfo">
+	delete from tb_login_log where loginId=#{loginId}
+</delete>
+</mapper>

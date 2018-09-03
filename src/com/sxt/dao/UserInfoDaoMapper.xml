@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.UserInfoDaoMapper">
+<cache eviction="FIFO" flushInterval="60000" size="1024" />
+	<sql id="commSql">
+		select u.userId as uId,u.*,r.rolerId as rId,r.*,p.permiId as pId,p.* from tb_user_info u
+		left join tb_roler_user ru on u.userId=ru.userId
+		left join tb_roler_info r on ru.rolerId=r.rolerId
+		left join tb_permi_roler pr on r.rolerId=pr.rolerId
+		left join tb_permission p on pr.permiId=p.permiId
+	</sql>
+	<select id="login" resultMap="userMapper">
+		<include refid="commSql"/>
+		where userName=#{userName} and userEmail=#{userEmail}
+	</select>
+	<select id="findUserWithPage" resultMap="userMapper">
+		<include refid="commSql" />
+		<where>
+			<if test="userNumber !=null and userNumber !=''">
+				u.userNumber like '%${userNumber}%'
+			</if>
+			<if test="userName !=null and userName !=''">
+				and u.userName like '%${userName}%'
+			</if>
+			<if test="userSex !=null and userSex!=''">
+				and u.userSex=#{userSex}
+			</if>
+			<if test="listRolerId !=null and listRolerId.size()>0">
+				and r.rolerId in
+				<foreach collection="listRolerId" item="rolerId" index="index" open="(" close=")" separator=",">
+					#{rolerId}
+				</foreach>
+			</if>
+		</where>
+		limit #{page},#{rows}
+	</select>
+	<select id="getUserCount" resultType="int">
+		select count(userId) from tb_user_info
+	</select>
+	<select id="findUserById" resultMap="userMapper">
+		<include refid="commSql"/>
+		where u.userId=#{id}
+	</select>
+	<select id="findUserAllInfo" resultMap="userMapper">
+		<include refid="commSql"/>
+	</select>
+	<resultMap type="com.sxt.entity.UserInfo" id="userMapper">
+		<id property="userId" column="uId" />
+		<result property="userName" column="userName" />
+		<result property="userNumber" column="userNumber" />
+		<result property="userPass" column="userPass" />
+		<result property="userAge" column="userAge" />
+		<result property="userSex" column="userSex" />
+		<result property="userTel" column="userTel" />
+		<result property="userEmail" column="userEmail" />
+		<result property="remark" column="remark" />
+		<collection property="setRolers" ofType="com.sxt.entity.RolerInfo">
+			<id property="rolerId" column="rId" />
+			<result property="rolerName" column="rolerName" />
+		</collection>
+		<collection property="setPermission" ofType="com.sxt.entity.PermissionInfo">
+			<id property="permiId" column="pId" />
+			<result property="permiName" column="permiName" />
+		</collection>
+	</resultMap>
+	<select id="findUserWithPageByRolerId" resultMap="userMapper">
+		<include refid="commSql"/>
+		where r.rolerId=#{rolerId} limit #{page},#{rows}
+	</select>
+	<select id="getUserCountByRolerId" resultType="int">
+		select count(rolerId) from tb_roler_user where rolerId=#{rolerId}
+	</select>
+	<update id="updateUserInfo">
+			update tb_user_info set
+			userNumber=#{userNumber},
+			userName=#{userName},
+			userPass=#{userPass},
+			userAge=#{userAge},
+			userSex=#{userSex},
+			userEmail=#{userEmail},
+			userTel=#{userTel},
+			remark=#{remark}
+			where userId=#{userId}
+	</update>
+	<delete id="deleteAllRolerofUser">
+		delete from tb_roler_user where userId=#{userId}
+	</delete>
+	<delete id="deleteRolerofUser">
+		delete from tb_roler_user where userId=#{userId} and rolerId=#{rolerId}
+	</delete>
+	<insert id="updateRolerOfUser">
+		insert into tb_roler_user(rolerId,userId)
+		values(#{rolerId},#{userId})
+	</insert>
+	<insert id="saveUser">
+		insert into tb_user_info(userNumber,userName,userPass,userAge,userSex,userEmail,userTel,remark)
+		values(#{userNumber},#{userName},#{userPass},#{userAge},#{userSex},#{userEmail},#{userTel},#{remark})
+	</insert>
+	<select id="findUserName" resultMap="userMapper">
+		<include refid="commSql"/>
+		where userName=#{userName}
+	</select>
+	<select id="findUserByUserName" resultMap="userMapper">
+		<include refid="commSql"/>
+		where userName=#{userName}
+	</select>
+	<select id="getUserId" resultType="int">
+		select userId from tb_user_info where userName=#{userName}
+	</select>
+	<delete id="delUserInfo">
+		delete from tb_user_info where userId=#{userId}
+	</delete>
+</mapper>

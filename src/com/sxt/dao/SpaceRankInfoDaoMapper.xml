@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.SpaceRankInfoDaoMapper">
+<sql id="commSql">
+	select sp.*,a.*,r.* from tb_space_rank sp left join tb_airLine_info a
+	on sp.airLineId=a.airLineId left join tb_rank r on sp.rankId=r.rankId
+</sql>
+<select id="findSpaceRankAllInfo" resultType="com.sxt.entity.SpaceRankInfo">
+	select * from tb_rank
+</select>
+<select id="findSpaceRankWithPage" resultType="com.sxt.entity.SpaceRankInfo">
+	<include refid="commSql"/>
+	<where>
+			<if test="airLineNumber !=null and airLineNumber !=''">
+				and a.airLineNumber=#{airLineNumber}
+			</if>
+			<if test="rankId !=null and rankId !=''">
+				and r.rankId=#{rankId}
+			</if>
+		</where>
+		limit #{page},#{rows}
+</select>
+<select id="findSpaceRankById" resultType="com.sxt.entity.SpaceRankInfo">
+	<include refid="commSql"/>
+	where sp.spaceId=#{id}
+</select>
+<select id="getSpaceRankCount" resultType="int">
+	select count(spaceId) from tb_space_rank
+</select>
+<select id="getSpacePrice" resultType="float">
+	select spacePraice from tb_space_rank where airLineId=#{airLineId} and rankId=#{rankId}
+</select>
+<insert id="saveSpaceRank">
+	insert into tb_space_rank(airLineId,spaceNumber,rankId,isGift,isNewspaper,
+	isDrink,isMovie,isChange,isReturnTicket,isDiscount,spacePrice,remark) values(
+	#{airLineId},#{spaceNumber},#{rankId},#{isGift},
+	#{isNewspaper},#{isDrink},#{isMovie},#{isChange},
+	#{isReturnTicket},#{isDiscount},#{spacePrice},#{remark})
+</insert>
+<delete id="delSpaceRankInfo">
+	delete from tb_space_rank where spaceId=#{spaceId}
+</delete>
+<update id="updateSpaceRankInfo">
+	update tb_space_rank set
+	airLineId=#{airLineId},
+	spaceNumber=#{spaceNumber},
+	rankId=#{rankId},
+	isGift=#{isGift},
+	isNewspaper=#{isNewspaper},
+	isDrink=#{isDrink},
+	isMovie=#{isMovie},
+	isChange=#{isChange},
+	isReturnTicket=#{isReturnTicket},
+	isDiscount=#{isDiscount},
+	spacePrice=#{spacePrice},
+	remark=#{remark}
+	where spaceId=#{spaceId}
+</update>
+</mapper>

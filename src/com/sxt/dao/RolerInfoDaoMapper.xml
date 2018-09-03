@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.RolerInfoDaoMapper">
+	<sql id="commSql">
+		select r.rolerId as rId,r.*,p.permiId as PId,p.* from tb_roler_info r
+		left join tb_permi_roler pr on r.rolerId=pr.rolerId
+		left join tb_permission p on pr.permiId=p.permiId
+	</sql>
+	<select id="findRolerAllInfo" resultType="com.sxt.entity.RolerInfo">
+		select rolerId,rolerNumber,rolerName,rolerDesc,remark from tb_roler_info
+	</select>
+	<select id="findRolerWithPage" resultMap="rolerMapper">
+		<include refid="commSql"/>
+			<where>
+			<if test="rolerNumber !=null and rolerNumber !=''">
+				rolerNumber like '%${rolerNumber}%'
+			</if>
+			<if test="rolerName !=null and rolerName !=''">
+				and rolerName like '%${rolerName}%'
+			</if>
+			<if test="listPermiId !=null and listPermiId.size()>0">
+				and p.permiId in
+				<foreach collection="listPermiId" item="permiId" index="index" open="(" close=")" separator=",">
+					#{permiId}
+				</foreach>
+			</if>
+		</where>
+		limit #{page},#{rows}
+	</select>
+	<select id="findRolerWithPageByPermiId" resultMap="rolerMapper">
+		<include refid="commSql"/>
+		where p.permiId=#{permiId} limit #{page},#{rows}
+	</select>
+	<select id="getRolerCountByPermiId" resultType="int">
+		select count(permiId) from tb_permi_roler
+	</select>
+	<select id="getRolerCount" resultType="int">
+		select count(rolerId) from tb_roler_info
+	</select>
+	<select id="findRolerById" resultMap="rolerMapper">
+		<include refid="commSql"/>
+		where r.rolerId=#{id}
+	</select>
+	<delete id="deleteAllPermissionofRoler">
+		delete from tb_permi_roler where rolerId=#{rolerId}
+	</delete>
+	<delete id="deletePermissionofRoler">
+		delete from tb_permi_roler where rolerId=#{rolerId} and permiId=#{permiId}
+	</delete>
+	<insert id="updatePermissionOfRoler">
+		insert into tb_permi_roler(permiId,rolerId)
+		values(#{permiId},#{rolerId})
+	</insert>
+	<insert id="saveRoler">
+		insert into tb_roler_info(rolerNumber,rolerName,rolerDesc,remark)
+		values(#{rolerNumber},#{rolerName},#{rolerDesc},#{remark})
+	</insert>
+	<select id="findRolerName" resultMap="rolerMapper">
+		<include refid="commSql"/>
+		where rolerName=#{rolerName}
+	</select>
+	<select id="getRolerId" resultType="int">
+		select rolerId from tb_roler_info where rolerName=#{rolerName}
+	</select>
+	<delete id="delRolerInfo">
+		delete from tb_roler_info where rolerId=#{rolerId}
+	</delete>
+	<resultMap type="com.sxt.entity.RolerInfo" id="rolerMapper">
+		<id property="rolerId" column="rId" />
+		<result property="rolerName" column="rolerName" />
+		<result property="rolerNumber" column="rolerNumber" />
+		<result property="rolerDesc" column="rolerDesc" />
+		<result property="remark" column="remark" />
+		<collection property="setPermission" ofType="com.sxt.entity.PermissionInfo">
+			<id property="permiId" column="pId" />
+			<result property="permiName" column="permiName" />
+		</collection>
+	</resultMap>
+</mapper>

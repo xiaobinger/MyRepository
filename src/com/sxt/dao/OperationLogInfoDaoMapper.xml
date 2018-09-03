@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.OperationLogInfoDaoMapper">
+<insert id="saveOpreationLogInfo">
+	insert into tb_operation_log(operaUserName,operaKind,operaTime,remark)
+	values(#{operaUserName},#{operaKind},#{operaTime},#{remark})
+</insert>
+<select id="findOperationLogWithPage" resultType="com.sxt.entity.OperationLogInfo">
+	select operaId,operaUserName,operaKind,operaTime,remark from tb_operation_log
+	<where>
+			<if test="operaUserName !=null and operaUserName !=''">
+				and operaUserName like '%${operaUserName}%'
+			</if>
+			<if test="operaTime !=null and operaTime!=''">
+				and operaTime like '%${operaTime}%'
+			</if>
+		</where>
+		limit #{page},#{rows}
+</select>
+<select id="getOperationLogCount" resultType="int">
+	select count(operaId) from tb_operation_log
+</select>
+<delete id="delOperationLogInfo">
+	delete from tb_operation_log where operaId=#{operaId}
+</delete>
+</mapper>

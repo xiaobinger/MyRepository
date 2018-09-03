@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 该标签就是描述sql语句映射的根标签，现在要将该配置文件和 操作的java类（UserDaoMapper）绑定 -->
+<mapper namespace="com.sxt.dao.TicketInfoDaoMapper">
+<sql id="commSql">
+	select tb.bookId,tb.bookNumber,tb.bookPrice,tb.bookSum,
+	tb.bookTime,tb.remark,tb.custId,tb.airLineId,tb.spaceId,
+	c.custId,c.custName,a.airLineId,a.airLineNumber,a.deparCity,a.arrivalCity,
+	s.spaceId,s.rankId,r.rankId,r.rankName
+	from tb_ticket_book tb left join tb_customer_info c 
+	on tb.custId=c.custId left join tb_airLine_info a
+	on tb.airLineId=a.airLineId left join tb_space_rank s
+	on tb.spaceId=s.spaceId left join tb_rank r
+	on s.rankId=r.rankId
+</sql>
+<select id="findTicketBookWithPage" resultType="com.sxt.entity.TicketInfo">
+	<include refid="commSql"/>
+	<where>
+			<if test="bookNumber !=null and bookNumber !=''">
+				tb.bookNumber like '%${bookNumber}%'
+			</if>
+			<if test="custId !=null and custId !=''">
+				and c.custId=#{custId}
+			</if>
+			<if test="bookTime !=null and bookTime !=''">
+				and tb.bookTime=#{bookTime}
+			</if>
+			<if test="airLineNumber !=null and airLineNumber !=''">
+				and a.airLineNumber=#{airLineNumber}
+			</if>
+			<if test="rankId !=null and rankId !=''">
+				and r.rankId=#{rankId}
+			</if>
+		</where>
+		limit #{page},#{rows}
+</select>
+<select id="getBookCount" resultType="int">
+	select count(bookId) from tb_ticket_book
+</select>
+<select id="getBookInfoById" resultType="com.sxt.entity.TicketInfo">
+	<include refid="commSql"/>
+	where tb.bookId=#{bookId}
+</select>
+<select id="findAllBooks" resultType="com.sxt.entity.TicketInfo">
+	<include refid="commSql"/>
+</select>
+<delete id="delTicketBookInfo">
+	delete from tb_ticket_book where bookId=#{bookId}
+</delete>
+</mapper>

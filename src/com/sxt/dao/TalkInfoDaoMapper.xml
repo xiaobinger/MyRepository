@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.TalkInfoDaoMapper">
+	<sql id="commSql">
+		select t.talkId,t.talkInfo,t.talkType,t.userId,u.userName from tb_talk_info t
+		left join tb_user_info u on t.userId=u.userId
+	</sql>
+	<select id="findAllInnerTalk" resultType="com.sxt.entity.TalkInfo">
+		<include refid="commSql"/>
+		where talkType=#{talkType}
+	</select>
+	<insert id="publishTalk">
+		insert into tb_talk_info(talkInfo,userId,talkType) 
+		values(#{talkInfo},#{userId},#{talkType})
+	</insert>
+	<delete id="delTalkInfo">
+		delete from tb_talk_info where talkId=#{talkId}
+	</delete>
+	<insert id="OutTalk">
+		insert into tb_talk_info(talkInfo,userId,talkType) 
+		values(#{talkInfo},#{userId},#{talkType})
+	</insert>
+	<select id="findOutMessage" resultType="com.sxt.entity.TalkInfo">
+		<include refid="commSql"/>
+		where talkType=#{talkType}
+	</select>
+	<update id="updataOutMessage">
+		update tb_talk_info set talkInfo=#{talkInfo} where talkType=#{talkType}
+	</update>
+</mapper>

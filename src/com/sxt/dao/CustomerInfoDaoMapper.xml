@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sxt.dao.CustomerInfoDaoMapper">
+	<sql id="commSql">
+		select c.custId as cId,c.custNumber,c.cusTypeId,c.custName,c.custPass,c.custAge,
+		c.custSex,c.custEmail,c.custTel,c.custAdress,c.custHirbeat,c.custIdCard,c.remark,ct.cusTypeId,
+		ct.cusTypeName,t.custId as tId,t.*  from tb_customer_info c left join tb_customer_type ct
+		on c.cusTypeId=ct.cusTypeId left join tb_ticket_book t on c.custId=t.custId
+	</sql>
+	<select id="loginOfCust" resultMap="customerMapper">
+		<include refid="commSql"/>
+		where c.custName=#{custName} and c.custPass=#{custPass}
+	</select>
+	<select id="findCustomerByCustName" resultMap="customerMapper">
+		<include refid="commSql"/>
+		where c.custName=#{custName}
+	</select>
+	<select id="findCustomerWithPage" resultMap="customerMapper">
+		<include refid="commSql"/>
+		<where>
+			<if test="custNumber !=null and custNumber !=''">
+				c.custNumber like '%${custNumber}%'
+			</if>
+			<if test="custName !=null and custName !=''">
+				c.custName like '%${custName}%'
+			</if>
+			<if test="cusTypeId !=null and cusTypeId !=''">
+				and c.cusTypeId=#{cusTypeId}
+			</if>
+			<if test="custSex !=null and custSex!=''">
+				and c.custSex=#{custSex}
+			</if>
+		</where>
+		limit #{page},#{rows}
+	</select>
+	<select id="getCustomerCount" resultType="int">
+		select count(custId) from tb_customer_info
+	</select>
+	<select id="findCustomerAllInfo" resultMap="customerMapper">
+		<include refid="commSql"/>
+	</select>
+	<select id="findCustomerById" resultMap="customerMapper">
+		<include refid="commSql"/>
+		where c.custId=#{id}
+	</select>
+	<update id="updateCustomerInfo">
+		update tb_customer_info set
+		custNumber=#{custNumber},
+		custName=#{custName},
+		custAge=#{custAge},
+		custSex=#{custSex},
+		custAdress=#{custAdress},
+		custHirbeat=#{custHirbeat},
+		custEmail=#{custEmail},
+		custTel=#{custTel},
+		cusTypeId=#{cusTypeId},
+		custIdCard=#{custIdCard},
+		remark=#{remark}
+		where custId=#{custId}
+	</update>
+	<insert id="registOfCust">
+		insert into tb_customer_info(custNumber,custPass,custName,custSex,custAge,custAdress,
+		custEmail,custTel,custHirbeat,custIdCard,cusTypeId) values(#{custNumber},#{custPass},#{custName},
+		#{custSex},#{custAge},#{custAdress},#{custEmail},
+		#{custTel},#{custHirbeat},#{custIdCard},#{cusTypeId})
+	</insert>
+	<delete id="delCustomerInfo">
+		delete from tb_customer_info where custId=#{custId}
+	</delete>
+	<resultMap type="com.sxt.entity.CustomerInfo" id="customerMapper">
+		<id property="custId" column="cId"/>
+		<result property="custNumber" column="custNumber"/>
+		<result property="custName" column="custName"/>
+		<result property="custPass" column="custPass"/>
+		<result property="custAge" column="custAge"/>
+		<result property="custSex" column="custSex"/>
+		<result property="custAdress" column="custAdress"/>
+		<result property="custHirbeat" column="custHirbeat"/>
+		<result property="custEmail" column="custEmail"/>
+		<result property="custTel" column="custTel"/>
+		<result property="cusTypeId" column="cusTypeId"/>
+		<result property="custIdCard" column="custIdCard"/>
+		<result property="cusTypeName" column="cusTypeName"/>
+		<result property="remark" column="remark"/>
+		<collection property="list" ofType="com.sxt.entity.TicketInfo">
+			<id property="bookId" column="tId"/>
+			<result property="bookNumber" column="bookNumber"/>
+			<result property="bookPrice" column="bookPrice"/>
+			<result property="bookSum" column="bookSum"/>
+			<result property="bookTime" column="bookTime"/>
+			<result property="flightTime" column="flightTime"/>
+			<result property="outTime" column="outTime"/>
+			<result property="inTime" column="inTime"/>
+			<result property="remark" column="remark"/>
+			<result property="custId" column="custId"/>
+			<result property="custName" column="custName"/>
+		</collection>
+	</resultMap>
+</mapper>
